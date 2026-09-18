@@ -374,7 +374,8 @@ section{padding:110px 0;position:relative}
 .contact h2{font-size:clamp(30px,4.4vw,52px);font-weight:900;margin-bottom:18px}
 .contact .lead{color:var(--fg-dim);margin:0 0 30px;max-width:38ch}
 .cline{display:flex;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--line-soft);font-size:14.5px;color:var(--fg-dim)}
-.cline b{color:var(--fg);font-weight:500}
+.cline b,.cline a{color:var(--fg);font-weight:500;transition:color .2s}
+.cline a:hover{color:var(--red)}
 form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .field{display:flex;flex-direction:column;gap:7px}
 .field.full{grid-column:1/-1}
@@ -585,13 +586,18 @@ body.still .scroll-cue i::after{animation-play-state:paused}
         <p class="eyebrow">Contact</p>
         <h2>Start a project</h2>
         <p class="lead">Send the store link and one line about what's stuck. If I'm not the right fit, I'll say so and point you somewhere better.</p>
-        <div class="cline"><span>Email</span><b id="c-email"></b></div>
-        <div class="cline"><span>WhatsApp</span><b id="c-phone"></b></div>
+        <div class="cline"><span>Email</span><a id="c-email" href="#"></a></div>
+        <div class="cline"><span>WhatsApp</span><a id="c-phone" href="#" target="_blank" rel="noopener"></a></div>
         <div class="cline"><span>Based in</span><b id="c-loc"></b></div>
         <div class="cline"><span>Replies in</span><b>Under 12 hours</b></div>
       </div>
 
-      <form id="form" novalidate>
+      <form id="form" novalidate action="https://formsubmit.co/rohitkumarshakya@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="New enquiry — portfolio site">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="true">
+        <input type="hidden" name="_next" value="https://claude.ai/artifact/DdjQCaWUm7EAZjpjXYkPaC?sent=true">
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
         <div class="field">
           <label for="f-name">Name</label>
           <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Your name">
@@ -633,11 +639,11 @@ body.still .scroll-cue i::after{animation-play-state:paused}
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-        <p class="note">This demo form has no backend connected — nothing is sent anywhere yet. Wire it to Formspree, Basin, or your own endpoint before going live.</p>
+        <p class="note">Submissions email rohitkumarshakya@gmail.com directly via FormSubmit. FormSubmit will ask you to verify that address the first time — after you click the one-time confirmation link, every future enquiry lands straight in your inbox.</p>
         <div class="sent" id="sent" role="status">
           <div class="tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#35D07F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Looks good</h3>
-          <p>Your details validated correctly. Once a form endpoint is connected, this is where the real confirmation appears.</p>
+          <h3>Sent</h3>
+          <p>Your enquiry is on its way. Rohit typically replies within 12 hours.</p>
           <button class="linkish" type="button" id="again">Send another</button>
         </div>
       </form>
@@ -663,12 +669,12 @@ body.still .scroll-cue i::after{animation-play-state:paused}
    EDIT EVERYTHING HERE — this is the only block you need to touch.
    ========================================================= */
 const DATA = {
-  monogram: "AM",
-  handle: "@yourhandle",
+  monogram: "RS",
+  handle: "Rohit Shakya",
   heroCopy: "I build Shopify stores, run them across marketplaces, drive traffic through Meta and Google, prove what worked in GA4, and generate the creative with AI instead of a studio day. One person, whole funnel.",
-  email: "hello@example.com",
-  phone: "+91 00000 00000",
-  location: "Gurugram, India",
+  email: "rohitkumarshakya@gmail.com",
+  phone: "+91 90158 66355",
+  location: "Ghaziabad, India",
 
   stats: [
     { value: 40,  suffix: "+", label: "Projects" },
@@ -771,7 +777,9 @@ $('#hero-copy').textContent = DATA.heroCopy;
 $('#about-1').textContent = DATA.about[0];
 $('#about-2').textContent = DATA.about[1];
 $('#c-email').textContent = DATA.email;
+$('#c-email').href = 'mailto:' + DATA.email;
 $('#c-phone').textContent = DATA.phone;
+$('#c-phone').href = 'https://wa.me/' + DATA.phone.replace(/[^\d]/g, '');
 $('#c-loc').textContent = DATA.location;
 $('#year').textContent = '© ' + new Date().getFullYear();
 
@@ -1082,26 +1090,34 @@ $('#motion-toggle').addEventListener('click', function(){
   $('#motion-label').textContent = paused ? 'Paused' : 'Motion';
 });
 
-// contact form
+// contact form — validates locally, then does a real POST to FormSubmit so
+// the enquiry actually emails Rohit. Success is shown when FormSubmit
+// redirects back here with ?sent=true (see _next hidden field above).
 const form = $('#form'), err = $('#err'), sent = $('#sent');
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  const name = $('#f-name').value.trim();
-  const mail = $('#f-email').value.trim();
-  const msg  = $('#f-msg').value.trim();
-  if(!name){ err.textContent = 'Add your name so I know who I\u2019m replying to.'; $('#f-name').focus(); return; }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ err.textContent = 'That email address doesn\u2019t look complete.'; $('#f-email').focus(); return; }
-  if(msg.length < 12){ err.textContent = 'Tell me a little more \u2014 a sentence is enough.'; $('#f-msg').focus(); return; }
-  err.textContent = '';
+function showSent(){
   $$('.field, .note, .err', form).forEach(el => el.style.display = 'none');
   sent.classList.add('show');
   sent.scrollIntoView({ block:'center', behavior: reduced ? 'auto':'smooth' });
+}
+form.addEventListener('submit', e => {
+  const name = $('#f-name').value.trim();
+  const mail = $('#f-email').value.trim();
+  const msg  = $('#f-msg').value.trim();
+  if(!name){ e.preventDefault(); err.textContent = 'Add your name so I know who I\u2019m replying to.'; $('#f-name').focus(); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ e.preventDefault(); err.textContent = 'That email address doesn\u2019t look complete.'; $('#f-email').focus(); return; }
+  if(msg.length < 12){ e.preventDefault(); err.textContent = 'Tell me a little more \u2014 a sentence is enough.'; $('#f-msg').focus(); return; }
+  err.textContent = '';
+  // valid: let the native POST to FormSubmit go through
 });
 $('#again').addEventListener('click', () => {
   form.reset(); sent.classList.remove('show');
   $$('.field, .note, .err', form).forEach(el => el.style.display = '');
   $('#f-name').focus();
 });
+if(new URLSearchParams(location.search).get('sent') === 'true'){
+  showSent();
+  history.replaceState(null, '', location.pathname + location.hash);
+}
 
 $('#to-top').addEventListener('click', () => window.scrollTo({ top:0, behavior: reduced ? 'auto':'smooth' }));
 </script>
