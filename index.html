@@ -1099,59 +1099,16 @@ function showSent(){
   sent.classList.add('show');
   sent.scrollIntoView({ block:'center', behavior: reduced ? 'auto':'smooth' });
 }
-<form action="https://formsubmit.co/rohitkumarshakya@gmail.com" method="POST" id="contact-form">
-
-  <input type="text" id="f-name" name="name" placeholder="Your Name" required>
-
-  <input type="email" id="f-email" name="email" placeholder="Your Email" required>
-
-  <textarea id="f-msg" name="message" placeholder="Your Message" required></textarea>
-
-  <input type="hidden" name="_subject" value="New Portfolio Contact">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_captcha" value="false">
-
-  <p id="form-error"></p>
-
-  <button type="submit">Send Message</button>
-
-</form>
-
-<script>
-const form = document.querySelector('#contact-form');
-const err = document.querySelector('#form-error');
-
 form.addEventListener('submit', e => {
-  const name = document.querySelector('#f-name').value.trim();
-  const mail = document.querySelector('#f-email').value.trim();
-  const msg = document.querySelector('#f-msg').value.trim();
-
-  if (!name) {
-    e.preventDefault();
-    err.textContent = 'Please enter your name.';
-    document.querySelector('#f-name').focus();
-    return;
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) {
-    e.preventDefault();
-    err.textContent = 'Please enter a valid email address.';
-    document.querySelector('#f-email').focus();
-    return;
-  }
-
-  if (msg.length < 12) {
-    e.preventDefault();
-    err.textContent = 'Please enter at least 12 characters in your message.';
-    document.querySelector('#f-msg').focus();
-    return;
-  }
-
+  const name = $('#f-name').value.trim();
+  const mail = $('#f-email').value.trim();
+  const msg  = $('#f-msg').value.trim();
+  if(!name){ e.preventDefault(); err.textContent = 'Add your name so I know who I\u2019m replying to.'; $('#f-name').focus(); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ e.preventDefault(); err.textContent = 'That email address doesn\u2019t look complete.'; $('#f-email').focus(); return; }
+  if(msg.length < 12){ e.preventDefault(); err.textContent = 'Tell me a little more \u2014 a sentence is enough.'; $('#f-msg').focus(); return; }
   err.textContent = '';
-
-  // Valid form: allow FormSubmit to send the email
+  // valid: let the native POST to FormSubmit go through
 });
-</script>
 $('#again').addEventListener('click', () => {
   form.reset(); sent.classList.remove('show');
   $$('.field, .note, .err', form).forEach(el => el.style.display = '');
